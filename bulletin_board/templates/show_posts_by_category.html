@@ -1,0 +1,20 @@
+{% if events %}
+
+{% for event in events %}
+    <div style="font-size: 25px; text-align: left">
+        <p><h2>{{event.title}}</h2></p>
+        <p><i>Событие создал: <a href="{{event.player.get_absolute_url}}">{{event.player}}</a></i></p>
+        <p><i>Дата публикации: {{event.time_create}}</i></p>
+        <p><i>Рекомендуемый уровень: {{event.requirement_level}}</i></p>
+        <p>{{event.preview}}</p>
+        <a href="{% url 'detail' event.slug %}">Подробнее о событии...</a>
+        {% if not forloop.last %}
+            <br>
+            <hr>
+        {% endif %}
+    </div>
+{% endfor %}
+
+{% else %}
+    <h1>В данной категории ещё не было создано ни одного объявления!</h1>
+{% endif %}

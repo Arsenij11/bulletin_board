@@ -1,0 +1,16 @@
+{% if event.photo %}<img src="{{event.photo.url}}" align="right" width="570" height="496" vspace="10" title="Фото поста" hspace="3">{% endif %}
+        <p><b>{{event.title}}</b></p>
+        <p><i>Категории: {% for c in event.category.all %}<a href="{{c.get_absolute_url}}">{{c.name}}</a>{% if not forloop.last %} {% endif %}{% endfor %}</i></p>
+        <p><i>Событие создал: <a href="{{event.player.get_absolute_url}}">{{event.player}}</a></i></p>
+        <p><i>Дата публикации: {{event.time_create}}</i></p>
+        <p><i>Участие могут принять только {% for c in event.category.all %}<u>{{c.name}}</u>{% if not forloop.last %} {% endif %}{% endfor %}</i></p>
+        <p>
+                <i>Рекомендуемый уровень: {{event.requirement_level}}</i>
+        </p>
+        <p><i><a href="{% url 'update event' event.pk %}">Редактировать объявление...</a></i></p>
+        <br clear="right">
+        {% autoescape off %}
+        <p style="font-size: 20px">{{event.text}}</p>
+        <p style="font-size: 20px"><b>Награды за турнир:</b></p>
+        <p style="font-size: 20px">{{event.awards}}</p>
+        {% endautoescape %}

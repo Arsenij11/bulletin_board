@@ -1,0 +1,44 @@
+{% extends 'flatpages/default.html' %}
+{% load custom_tags %}
+
+{% block title %}
+Создание отклика с событию: {{event.title}}
+{% endblock title %}
+
+{% block content %}
+<br>
+<h1>Отклики к событию <a href="{{event.get_absolute_url}}">{{event.title}}</a></h1>
+<br>
+<hr>
+<br>
+<div style="font-size: 35px; text-align: left; line-height: 1.5em">
+        {% show_event event.pk %}
+</div>
+<hr>
+
+{% if responses %}
+    {% for r in responses %}
+        <div style="font-size: 28px; text-align: left">
+            <img src="{{r.player.profile_picture.url}}" align="left" width="155" height="155" alt="Аватарка" title="Аватарка" hspace="15" border="1">
+            <p><i><a href="{{r.player.get_absolute_url}}"> {{r.player}}</a> <i style="font-size: 14px">{{r.time_create}}</i></i></p>
+            <p>{{r.message}}</p>
+            <p>
+                <a href="{% url 'delete response' r.pk %}" style="font-size: 12px; color: grey"><i>Удалить</i></a>
+                <a href="{% url 'update response' r.pk %}" style="font-size: 12px; color: grey"><i>Редактировать</i></a>
+                <a href="{% url 'show answers to response' r.pk %}" style="font-size: 12px; color: grey">Просмотреть все ответы к отклику</a>
+                <a href="{% url 'create answer' r.pk %}" style="font-size: 12px; color: grey"><i>Ответить</i></a>
+            </p>
+            {% if not forloop.last %}
+            <hr>
+            {% endif %}
+        </div>
+    {% endfor %}
+{% endif %}
+
+<br>
+<form action="" method="POST" style="text-align: left">
+    {% csrf_token %}
+    {{form.as_p}}
+    <p><button type="submit">Откликнуться на объявление</button></p>
+</form>
+{% endblock %}

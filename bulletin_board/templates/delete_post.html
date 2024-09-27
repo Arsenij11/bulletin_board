@@ -1,0 +1,13 @@
+{% extends 'flatpages/default.html' %}
+
+{% block title %}
+{{title}}
+{% endblock %}
+
+{% block content %}
+<br>
+<h1>{{title}}</h1>
+<br>
+<hr>
+<p style="font-size: 25px"><a href="{% url 'successful delete' event.slug %}">Да</a><a href="{% url 'main' %}" style="white-space: pre;">&#9;Нет</a></p>
+{% endblock %}

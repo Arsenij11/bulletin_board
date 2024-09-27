@@ -1,0 +1,37 @@
+{% extends 'flatpages/default.html' %}
+{% load custom_tags %}
+
+{% block title %}
+Категория {{category.name}}
+{% endblock %}
+
+{% block content %}
+<br>
+
+{% if author %}
+
+<a href="{% url 'category' category.slug %}"><h1>Список объявлений категории "{{category.name}}"</h1></a>
+{% else %}
+<h1>Список объявлений категории "{{category.name}}"</h1>
+
+{% endif %}
+
+<br>
+
+{% if not author %}
+<a href="{% url 'authors_by_category' category.slug %}"><h1>Список игроков гильдии "{{category.name}}"</h1></a>
+{% else %}
+<h1>Список игроков гильдии "{{category.name}}"</h1>
+{% endif %}
+
+<br>
+<hr>
+<br>
+
+{% if author %}
+{% show_authors_by_category category.pk %}
+{% else %}
+{% show_posts_by_category category.pk %}
+{% endif %}
+
+{% endblock %}

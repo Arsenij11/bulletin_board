@@ -1,0 +1,20 @@
+{% if authors %}
+{% for a in authors %}
+<div style="font-size: 34px; text-align: left">
+    {% if a.profile_picture %}<img src="{{a.profile_picture.url}}" align="right" width="520" height="496" vspace="10" alt="Аватарка" title="Аватарка" hspace="3" border="1">{% endif %}
+    <br>
+    <p><i>{{a.name}}</i></p>
+    <p><i>Гильдия: {{a.guild}}</i></p>
+    <p><i>Уровень: {{a.level}}</i></p>
+    <p><i>Количество объявлений: {{a.count_of_posts}}</i></p>
+    <p><i>Количество откликов: {{a.count_of_posts}}</i></p>
+    <p><i><a href="{{a.get_absolute_url}}">Просмотреть профиль...</a></i></p>
+    <br clear="right">
+    {% if not forloop.last %}
+    <hr>
+    {% endif %}
+</div>
+{% endfor %}
+{% else %}
+<h2>В данной гильдии не состоит ни один игрок!</h2>
+{% endif %}

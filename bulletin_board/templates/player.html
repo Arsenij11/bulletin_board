@@ -1,0 +1,70 @@
+{% extends 'flatpages/default.html' %}
+
+{% block title %}
+Все объявления от игрока: {{player.name}}
+{% endblock title %}
+
+{% block content %}
+<br>
+<h1>Профиль игрока {{player.name}}</h1>
+<br>
+<hr>
+<br>
+<div style="font-size: 29px; text-align: left">
+    {% if player.profile_picture %}<img src="{{player.profile_picture.url}}" align="right" width="520" height="496" vspace="10" alt="Аватарка" title="Аватарка" hspace="3" border="1">{% endif %}
+    <p><i>{{player.name}}</i></p>
+    {% if player.age %}<p><i>Возраст: {{player.age}} {{year}}</i></p>{% endif %}
+   <p><i>Пол: {% if player.sex == 'Male' %}Мужской{% else %}Женский</i></p>{% endif %}
+    {% if player.city %}<p><i>Город: {{player.city}}</i></p>{% endif %}
+    <p><i>Гильдия: <a href="{% url 'authors_by_category' player.guild.slug %}">{{player.guild}}</a></i></p>
+    <p><i>Уровень: {{player.level}}</i></p>
+    <p><i>Рейтинг: {{player.rating}}</i></p>
+    <p><i>Дата регистрации на сайте:</i></p>
+    <p><i>{{player.registration_time}}</i></p>
+    <p><a href="{% url 'edit author' player.pk %}">Редактировать профиль</a></p>
+</div>
+<br clear="right">
+<hr>
+<br>
+
+{% if events %}
+
+    <p style="font-size: 40px; text-align: left"><b>Все объявления:</b></p>
+    <br>
+    {% for event in events %}
+    <div style="font-size: 30px; text-align: left">
+        <p><h2>{{event.title}}</h2></p>
+        <p><i>Категории: {% for c in event.category.all %}<a href="{{c.get_absolute_url}}">{{c.name}}</a>{% if not forloop.last %} {% endif %}{% endfor %}</i></p>
+        <p><i>Дата публикации: {{event.time_create}}</i></p>
+        <p>{{event.preview}}</p>
+        <p><i><a href="{{event.get_absolute_url}}">Подробнее о событии...</a></i></p>
+        <p><i><a href="{% url 'response' event.pk %}">Все отклики к объявлению...</a></i></p>
+        {% if not forloop.last %}
+            <hr>
+        {% endif %}
+    </div>
+    {% endfor %}
+
+{% else %}
+    <h1>Этот автор ещё не создал ни одного объявления!</h1>
+{% endif %}
+<br>
+<hr>
+<br>
+{% if responses %}
+<p style="font-size: 35px; text-align: left"><b>Все отклики автора:</b></p>
+<br>
+    {% for r in responses %}
+    <div style="font-size: 30px; text-align: left">
+        <p><i><b>{{r.event}}</b></i></p>
+        <p><i>{{r.message}}</i></p>
+        <p><i><a href="{{r.event.get_absolute_url}}">Подробнее о событии...</a></i></p>
+        <p><i><a href="{{r.get_absolute_url}}">Все отклики к объявлению...</a></i></p>
+    </div>
+    {% if not forloop.last %}<hr>{% endif %}
+    {% endfor %}
+{% else %}
+    <h1>Этот автор ещё не откликнулся ни на одно объявление!</h1>
+{% endif %}
+
+{% endblock content %}

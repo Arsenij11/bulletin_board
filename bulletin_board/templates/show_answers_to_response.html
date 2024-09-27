@@ -1,0 +1,56 @@
+{% extends 'flatpages/default.html' %}
+{% load custom_tags %}
+
+{% block title %}
+{{event.title}}
+{% endblock title %}
+
+{% block content %}
+<br>
+<h1>Отклики к событию <a href="{{event.get_absolute_url}}">{{event.title}}</a></h1>
+<br>
+<hr>
+<br>
+<div style="font-size: 35px; text-align: left; line-height: 1.5em">
+      {% show_event event.pk %}
+</div>
+<hr>
+
+{% for r in responses %}
+<div style="font-size: 28px; text-align: left">
+    <img src="{{r.player.profile_picture.url}}" align="left" width="155" height="155" alt="Аватарка" title="Аватарка" hspace="15" border="1">
+    <p><i><a href="{{r.player.get_absolute_url}}"> {{r.player}}</a> <i style="font-size: 14px">{{r.time_create}}</i></i></p>
+    <p>{{r.message}}</p>
+    <p>
+        <a href="{% url 'delete response' r.pk %}" style="font-size: 12px; color: grey"><i>Удалить</i></a>
+        <a href="{% url 'update response' r.pk %}" style="font-size: 12px; color: grey"><i>Редактировать</i></a>
+        <a href="{% url 'create answer' r.pk %}" style="font-size: 12px; color: grey"><i>Ответить</i></a>
+        {% if ourresp == r.pk %}
+            {% if answers %}
+                {% for a in answers %}
+                    {% if not forloop.first %}<br>{% endif %}
+                    <div style="margin-left: 155px;">
+                        <img src="{{a.player.profile_picture.url}}" align="left" width="155" height="155" alt="Аватарка" title="Аватарка" hspace="15" border="1">
+                        <p><a href="{{a.player.get_absolute_url}}">{{a.player}}</a> <i style="font-size: 14px">{{a.time_create}}</i></p>
+                        <p>{{a.message}}</p>
+                        <a href="{% url 'delete answer' a.pk %}" style="font-size: 12px; color: grey"><i>Удалить</i></a>
+                        <a href="{% url 'update answer' a.pk %}" style="font-size: 12px; color: grey"><i>Редактировать</i></a>
+                    </div>
+                {% endfor %}
+                <br>
+            {% else %}
+                    <a href="{% url 'show answers to response' r.pk %}" style="font-size: 12px; color: grey"><i>Просмотреть все ответы к отклику</i></a>
+                </p>
+            {% endif %}
+        {% else %}
+                <a href="{% url 'show answers to response' r.pk %}" style="font-size: 12px; color: grey"><i>Просмотреть все ответы к отклику</i></a></p>
+        {% endif %}
+    {% if not forloop.last %}
+
+    <hr>
+    {% endif %}
+</div>
+{% endfor %}
+<br>
+<p style="font-size: 25px; text-align: left"><i><a href="{% url 'create_response' event.pk %}">Откликнуться на объявление</a></i></p>
+{% endblock content %}

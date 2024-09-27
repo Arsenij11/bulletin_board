@@ -1,0 +1,61 @@
+{% extends 'flatpages/default.html' %}
+
+{% block title %}
+{{title}}
+{% endblock %}
+
+{% block content %}
+<br>
+<h1><a href="{% url 'main' %}">Все объявления</a></h1>
+<br>
+<h1>{{title}}</h1>
+<br>
+<hr>
+{% if authors %}
+{% for a in authors %}
+<div style="font-size: 34px; text-align: left">
+    {% if a.profile_picture %}<img src="{{a.profile_picture.url}}" align="right" width="520" height="496" vspace="10" alt="Аватарка" title="Аватарка" hspace="3" border="1">{% endif %}
+    <br>
+    <p><i>{{a.name}}</i></p>
+    <p><i>Гильдия: <a href="{% url 'authors_by_category' a.guild.slug %}">{{a.guild}}</a></i></p>
+    <p><i>Уровень: {{a.level}}</i></p>
+    <p><i>Количество объявлений: {{a.count_of_posts}}</i></p>
+    <p><i>Количество откликов: {{a.count_of_posts}}</i></p>
+    <p><i><a href="{{a.get_absolute_url}}">Просмотреть профиль...</a></i></p>
+    <br clear="right">
+    {% if not forloop.last %}
+    <hr>
+    {% endif %}
+</div>
+{% endfor %}
+{% else %}
+<h2>На данном ресурсе пока ещё не зарегистрировался ни один автор!</h2>
+{% endif %}
+
+
+<script>
+    for (let i=0; i<4; i++){
+    document.write("<br>")
+    }
+</script>
+
+
+<div style="font-size: 28px" >
+{% if page_obj.has_previous %}
+    <a href="?page={{page_obj.previous_page_number}}"><</a>&nbsp;
+    <a href="?page=1">1</a>
+    {% if page_obj.previous_page_number != 1 %}
+    {% if page_obj.previous_page_number != 2 %}...{% endif %} <a href="?page={{page_obj.previous_page_number}}">{{page_obj.previous_page_number}}</a>
+    {% endif %}
+{% endif %}
+{{page_obj.number}}
+{% if page_obj.has_next %}
+    <a href="?page={{page_obj.next_page_number}}">{{page_obj.next_page_number}}</a>
+    {% if page_obj.next_page_number != paginator.num_pages %}
+    ... <a href="?page={{paginator.num_pages}}">{{paginator.num_pages}}</a>
+    {% endif %}
+    &nbsp;<a href="?page={{page_obj.next_page_number}}">></a>
+{% endif %}
+</div>
+
+{% endblock %}

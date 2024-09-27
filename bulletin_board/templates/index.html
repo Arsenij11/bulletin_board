@@ -1,0 +1,67 @@
+{% extends 'flatpages/default.html' %}
+{% block title %}
+{{title}}
+{% endblock title %}
+
+
+{% block content %}
+
+<br>
+<h1>{{title}}</h1>
+<br>
+<h1><a href="{% url 'authors' %}">Все авторы</a></h1>
+<br>
+<hr>
+<br>
+
+{% if events %}
+
+    {% for event in events %}
+    <div style="font-size: 32px; text-align: left">
+        {% if event.photo %}<img src="{{event.photo.url}}" align="right" width="570" height="496" vspace="10" title="Фото поста" hspace="3">{% endif %}
+        <p><b>{{event.title}}</b></p>
+        <p><i>Категории: {% for c in event.category.all %}<a href="{{c.get_absolute_url}}">{{c.name}}</a>{% if not forloop.last %} {% endif %}{% endfor %}</i></p>
+        <p><i>Событие создал: <a href="{{event.player.get_absolute_url}}">{{event.player}}</a></i></p>
+        <p><i>Дата публикации: {{event.time_create}}</i></p>
+        <p><i>Рекомендуемый уровень: {{event.requirement_level}}</i></p>
+        <p>{{event.preview}}</p>
+        {% if event.photo %}<br clear="right">{% endif %}
+        <a href="{% url 'detail' event.slug %}">Подробнее о событии...</a>
+        <br>
+        {% if not forloop.last %}
+            <br>
+            <hr>
+        {% endif %}
+    </div>
+    {% endfor %}
+
+{% else %}
+    <h1>Свежих объявлений нет!</h1>
+{% endif %}
+
+<script>
+    for (let i=0; i<4; i++){
+    document.write("<br>")
+    }
+</script>
+
+<div style="font-size: 28px" >
+{% if page_obj.has_previous %}
+    <a href="?page={{page_obj.previous_page_number}}"><</a>&nbsp;
+    <a href="?page=1">1</a>
+    {% if page_obj.previous_page_number != 1 %}
+    {% if page_obj.previous_page_number != 2 %}...{% endif %} <a href="?page={{page_obj.previous_page_number}}">{{page_obj.previous_page_number}}</a>
+    {% endif %}
+{% endif %}
+{{page_obj.number}}
+{% if page_obj.has_next %}
+    <a href="?page={{page_obj.next_page_number}}">{{page_obj.next_page_number}}</a>
+    {% if page_obj.next_page_number != paginator.num_pages %}
+    ... <a href="?page={{paginator.num_pages}}">{{paginator.num_pages}}</a>
+    {% endif %}
+    &nbsp;<a href="?page={{page_obj.next_page_number}}">></a>
+{% endif %}
+</div>
+
+
+{% endblock content %}

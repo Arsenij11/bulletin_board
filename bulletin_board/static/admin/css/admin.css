@@ -1,0 +1,22 @@
+#header, .module caption, #changelist-filter h2{
+    background: #212529;
+}
+
+#user-tools, #logout-form button, strong {
+    color: #FFFFFF;
+}
+
+#nav-sidebar .current-app .section:link, #nav-sidebar .current-app .section:visited  {
+    color: #FFFFFF;
+}
+
+a:link, a:visited {
+    color: #FFFFFF;
+}
+#site-name a:link, #site-name a:visited {
+    color: #FFFFFF;
+}
+
+div.breadcrumbs {
+    background: #313438;
+}
