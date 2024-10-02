@@ -452,13 +452,9 @@ class PrivateWebPage(LoginRequiredMixin, DataMixin,ListView):
 
     def get_queryset(self):
         events = Event.published.filter(player_id=self.kwargs['player_id']).prefetch_related('resp').prefetch_related('category').select_related('player')
-        if len(events) > 0:
-            responses = Responses.objects.filter(Q(event__in=events) & ~Q(player_id=self.kwargs['player_id']))
-            self.filterset = ResponseFilter(self.request.GET, responses) if len(responses) > 0 else None
-            return self.filterset.qs if self.filterset is not None else None
-        else:
-            self.filterset = None
-            return None
+        responses = Responses.objects.filter(Q(event__in=events) & ~Q(player_id=self.kwargs['player_id']))
+        self.filterset = ResponseFilter(self.request.GET, responses)
+        return self.filterset.qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
