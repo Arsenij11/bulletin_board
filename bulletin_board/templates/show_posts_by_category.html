@@ -1,6 +1,6 @@
 {% if events %}
 
-{% for event in events %}
+{% for event in page_obj %}
     <div style="font-size: 25px; text-align: left">
         <p><h2>{{event.title}}</h2></p>
         <p><i>Событие создал: <a href="{{event.player.get_absolute_url}}">{{event.player}}</a></i></p>
@@ -14,6 +14,24 @@
         {% endif %}
     </div>
 {% endfor %}
+
+<div style="font-size: 28px" >
+{% if page_obj.has_previous %}
+    <a href="?page={{page_obj.previous_page_number}}"><</a>&nbsp;
+    <a href="?page=1">1</a>
+    {% if page_obj.previous_page_number != 1 %}
+    {% if page_obj.previous_page_number != 2 %}...{% endif %} <a href="?page={{page_obj.previous_page_number}}">{{page_obj.previous_page_number}}</a>
+    {% endif %}
+{% endif %}
+{{page_obj.number}}
+{% if page_obj.has_next %}
+    <a href="?page={{page_obj.next_page_number}}">{{page_obj.next_page_number}}</a>
+    {% if page_obj.next_page_number != paginator.num_pages %}
+    ... <a href="?page={{paginator.num_pages}}">{{paginator.num_pages}}</a>
+    {% endif %}
+    &nbsp;<a href="?page={{page_obj.next_page_number}}">></a>
+{% endif %}
+</div>
 
 {% else %}
     <h1>В данной категории ещё не было создано ни одного объявления!</h1>

@@ -29,9 +29,9 @@
 <br>
 
 {% if author %}
-{% show_authors_by_category category.pk %}
+{% show_authors_by_category category.pk page_number %}
 {% else %}
-{% show_posts_by_category category.pk %}
+{% show_posts_by_category category.pk page_number %}
 {% endif %}
 
 {% endblock %}

@@ -13,7 +13,7 @@ class Players(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='player', verbose_name='username')
     level = models.IntegerField(default=0, verbose_name='Уровень', validators=[MinValueValidator(0, message='Ошибка! Минимально допустимое значение: 0'),
                                                                                 MaxValueValidator(50, message='Ошибка! Максимально допустимое значение: 50')])
-    name = models.CharField(max_length=100,verbose_name='ФИО', validators=[MinLengthValidator(2, message='Ошибка! Минимально допустимое количество символов: 2'),
+    name = models.CharField(max_length=100,verbose_name='Имя', validators=[MinLengthValidator(2, message='Ошибка! Минимально допустимое количество символов: 2'),
                                                                            MaxLengthValidator(100, message='Ошибка! Максимально допустимое количество символов: 100')])
     age = models.IntegerField(blank=True, null=True, verbose_name='Возраст', validators=[MinValueValidator(14, message='Минимально допустимый возраст игрока 14 лет'),
                                                                                          MaxValueValidator(123, message='Вам не может быть столько лет!')])
@@ -79,6 +79,7 @@ class Event(models.Model):
     video = models.FileField(upload_to='video/%Y/%m/%d', default=None, null=True, blank=True,
                               verbose_name='Видео контент')
 
+
     objects = models.Manager()
     published = Published()
 
@@ -97,10 +98,11 @@ class Event(models.Model):
 
 
 class Responses(models.Model):
-    player = models.ForeignKey(Players, on_delete=models.DO_NOTHING, related_name='resp', verbose_name='Игрок')
+    player = models.ForeignKey(Players, on_delete=models.SET_NULL, related_name='resp', verbose_name='Игрок', null=True)
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='resp', verbose_name='Событие/объявление')
     message = models.CharField(max_length=100, verbose_name='Текст сообщения')
     time_create = models.DateTimeField(auto_now_add=True, verbose_name='Дата отклика')
+    is_taken = models.BooleanField(default=False, choices=list(map(lambda x: (bool(x[0]), x[1]), [(0, 'Не принят'), (1, 'Принят')])), verbose_name='Статус')
 
     def __str__(self):
         return self.message
@@ -115,8 +117,8 @@ class Responses(models.Model):
         ordering = ['time_create']
 
 class AnswertoResponse(models.Model):
-    player = models.ForeignKey(to=Players, on_delete=models.DO_NOTHING, related_name='answers', verbose_name='Игрок')
-    resp = models.ForeignKey(to=Responses, on_delete=models.DO_NOTHING, related_name='answers', verbose_name='Отклик')
+    player = models.ForeignKey(to=Players, on_delete=models.SET_NULL, related_name='answers', verbose_name='Игрок', null=True)
+    resp = models.ForeignKey(to=Responses, on_delete=models.CASCADE, related_name='answers', verbose_name='Отклик')
     message = models.CharField(max_length=100, verbose_name='Текст сообщения')
     time_create = models.DateTimeField(auto_now_add=True, verbose_name='Дата ответа на отклик')
 

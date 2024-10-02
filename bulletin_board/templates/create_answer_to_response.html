@@ -12,45 +12,36 @@
 <hr>
 <br>
 <div style="font-size: 35px; text-align: left; line-height: 1.5em">
-        {% show_event event.pk %}
+        {% show_event event.pk user %}
 </div>
 <hr>
 
 {% for r in responses %}
+
 <div style="font-size: 28px; text-align: left">
-    <img src="{{r.player.profile_picture.url}}" align="left" width="155" height="155" alt="Аватарка" title="Аватарка" hspace="15" border="1">
-    <p><i><a href="{{r.player.get_absolute_url}}"> {{r.player}}</a> <i style="font-size: 14px">{{r.time_create}}</i></i></p>
-    <p>{{r.message}}</p>
-    <p>     <a href="{% url 'delete response' r.pk %}" style="font-size: 12px; color: grey"><i>Удалить</i></a>
-            <a href="{% url 'update response' r.pk %}" style="font-size: 12px; color: grey"><i>Редактировать</i></a>
-            <a href="{% url 'show answers to response' r.pk %}" style="font-size: 12px; color: grey"><i>Просмотреть все ответы к отклику</i></a>
-            <a href="{% url 'create answer' r.pk %}" style="font-size: 12px; color: grey"><i>Ответить</i></a>
-    </p>
+    {% inf_resp r user %}
         {% if ourresp == r.pk %}
             {% if r.answers %}
                 {% for a in r.answers.all %}
                     {% if not forloop.first %}<br>{% endif %}
                     <div style="margin-left: 155px">
-                        <img src="{{a.player.profile_picture.url}}" align="left" width="155" height="155" alt="Аватарка" title="Аватарка" hspace="15" border="1">
-                                <p><i><a href="{{a.player.get_absolute_url}}">{{a.player}}</a> <i style="font-size: 14px">{{a.time_create}}</i></i></p>
-                                <p>{{a.message}}</p>
-                        <a href="{% url 'delete answer' a.pk %}" style="font-size: 12px; color: grey"><i>Удалить</i></a>
-                        <a href="{% url 'update answer' a.pk %}" style="font-size: 12px; color: grey"><i>Редактировать</i></a>
+                        {% inf_answ a user %}
                     </div>
                 {% endfor %}
             <br>
             {% endif %}
             <form action="" method="POST" style="text-align: left; margin-left: 165px">
                     {% csrf_token %}
+                    <p><label>Игрок:</label><input type="text" value="{{player.name}}" disabled></p>
                     {{form.as_p}}
                     <p><button type="submit">Ответить на отклик</button></p>
             </form>
         {% endif %}
     {% if not forloop.last %}
-
     <hr>
     {% endif %}
 </div>
+
 {% endfor %}
 <br>
 <p style="font-size: 25px; text-align: left"><i><a href="{% url 'create_response' event.pk %}">Откликнуться на объявление</a></i></p>

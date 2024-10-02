@@ -1,7 +1,7 @@
 {% extends 'flatpages/default.html' %}
 
 {% block title %}
-{% if title %}{{title}}{% else %}Создание объявления{% endif %}
+{% if title %}{{title}}{% else %}Создание профиля{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -12,6 +12,7 @@
 <br>
 <form action="" enctype="multipart/form-data" method="POST">
     {% csrf_token %}
+    <p><label>Username:</label> <input value="{{user.username}}" type="text" disabled></p>
     {{form.as_p}}
     <button type="submit">{% if title %}Обновить профиль{% else %}Создать профиль{% endif %}</button>
 </form>

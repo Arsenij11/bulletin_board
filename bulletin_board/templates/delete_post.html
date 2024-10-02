@@ -9,5 +9,5 @@
 <h1>{{title}}</h1>
 <br>
 <hr>
-<p style="font-size: 25px"><a href="{% url 'successful delete' event.slug %}">Да</a><a href="{% url 'main' %}" style="white-space: pre;">&#9;Нет</a></p>
+<p style="font-size: 25px"><a href="{% url 'successful delete' event.slug %}">Да</a>&#9;&#9;&nbsp;<a href="{% url 'detail' event.slug %}" style="white-space: pre;">Нет</a></p>
 {% endblock %}

@@ -22,9 +22,11 @@ urlpatterns = [
     path('authors', views.AllAuthors.as_view(), name='authors'),
     path('create/profile', views.CreateProfile.as_view(), name='create profile'),
     path('edit/author/<int:player_id>', views.UpdateProfile.as_view(), name='edit author'),
+    path('delete/author/<int:player_id>', views.DeleteProfile.as_view(), name='delete author'),
     path('response_create/<int:event_id>', views.CreateResponse.as_view(), name='create_response'),
     path('response_edit/<int:resp_id>', views.UpdateResponse.as_view(), name='update response'),
-    path('login', views.login, name='login'),
     path('delete_post/<slug:event_slug>', views.delete_post, name='delete of post'),
-    path('successful_delete/<slug:event_slug>', views.successful_delete, name='successful delete')
+    path('successful_delete/<slug:event_slug>', views.successful_delete, name='successful delete'),
+    path('private_web_page/<int:player_id>', views.PrivateWebPage.as_view(), name='private webpage'),
+    path('take_player/resp/<int:resp_id>',views.take_player_by_response, name='take player by response')
 ]

@@ -18,7 +18,16 @@
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
    <div class="container">
        {% for m in menu %}
-         <a class="navbar-brand" href="{% url m.URL %}">{{m.title}}</a>
+            {% if m.title == 'Войти'%}
+                {% if user.is_authenticated %}
+                    <p class="navbar-brand">{% if user.player %}<a class="navbar-brand" href="{% url 'player' user.player.id %}">{{user.username}}</a>{% else %}{{user.username}}{% endif %}
+                        |&nbsp;&nbsp;&nbsp;<a class="navbar-brand" href="{% url 'users:logout' %}">Выйти</a></p>
+                {% else %}
+                     <p class="navbar-brand"><a class="navbar-brand" href="{% url 'users:login' %}">Войти</a>|&nbsp;&nbsp;&nbsp;<a class="navbar-brand" href="{% url 'users:registration' %}">Регистрация</a></p>
+                {% endif %}
+           {% else %}
+                    <p class="navbar-brand"><a class="navbar-brand" href="{% url m.URL %}">{{m.title}}</a></p>
+           {% endif %}
        {% endfor %}
 
    </div>

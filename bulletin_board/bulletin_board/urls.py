@@ -23,6 +23,7 @@ from bulletin_board import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('board.urls')),
+    path('users/', include('users.urls', namespace='users')),
     path('__debug__/', include('debug_toolbar.urls'))
 ]
 

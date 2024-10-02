@@ -6,12 +6,13 @@
 
 {% block content %}
 <br>
-<h1>Профиль игрока {{player.name}}</h1>
+{% if player.user == user %}<h1>Ваш профиль</h1>{% else %}<h1>Профиль игрока {{player.name}}</h1>{% endif %}
 <br>
 <hr>
 <br>
-<div style="font-size: 29px; text-align: left">
-    {% if player.profile_picture %}<img src="{{player.profile_picture.url}}" align="right" width="520" height="496" vspace="10" alt="Аватарка" title="Аватарка" hspace="3" border="1">{% endif %}
+<!--{% if player.profile_picture %}<img src="{{player.profile_picture.url}}" align="left" width="520" height="496" vspace="10" hspace="15" alt="Аватарка" title="Аватарка"  border="1">{% endif %}-->
+<div style="font-size: 28px; text-align: left">
+    {% if player.profile_picture %}<img src="{{player.profile_picture.url}}" align="left" width="520" height="496" vspace="10" alt="Аватарка" title="Аватарка" hspace="25" border="1">{% endif %}
     <p><i>{{player.name}}</i></p>
     {% if player.age %}<p><i>Возраст: {{player.age}} {{year}}</i></p>{% endif %}
    <p><i>Пол: {% if player.sex == 'Male' %}Мужской{% else %}Женский</i></p>{% endif %}
@@ -21,15 +22,18 @@
     <p><i>Рейтинг: {{player.rating}}</i></p>
     <p><i>Дата регистрации на сайте:</i></p>
     <p><i>{{player.registration_time}}</i></p>
-    <p><a href="{% url 'edit author' player.pk %}">Редактировать профиль</a></p>
+    <br clear="left">
+    {% if user.player == player or user.is_superuser %}<p style="margin-left: 20px"><a href="{% url 'private webpage' player.pk %}"><i>Просмотреть отклики на объявления</i></a></p>{% endif %}
+    {% if user.player == player or user.is_superuser %}<p style="margin-left: 20px"><a href="{% url 'edit author' player.pk %}"><i>Редактировать профиль</i></a></p>{% endif %}
+    {% if user.player == player or user.is_superuser %}<p style="margin-left: 20px"><a href="{% url 'delete author' player.pk %}" style="color: red"><i>Удалить профиль</i></a></p>{% endif %}
 </div>
-<br clear="right">
+<br>
 <hr>
 <br>
 
 {% if events %}
 
-    <p style="font-size: 40px; text-align: left"><b>Все объявления:</b></p>
+    <p style="font-size: 40px; text-align: left"><b>Ваши объявления:</b></p>
     <br>
     {% for event in events %}
     <div style="font-size: 30px; text-align: left">
@@ -46,13 +50,13 @@
     {% endfor %}
 
 {% else %}
-    <h1>Этот автор ещё не создал ни одного объявления!</h1>
+   {% if player.user == user %}<h1>Вы ещё не создали ни одного объявления</h1>{% else %}<h1>Этот автор ещё не создал ни одного объявления!</h1>{% endif %}
 {% endif %}
 <br>
 <hr>
 <br>
 {% if responses %}
-<p style="font-size: 35px; text-align: left"><b>Все отклики автора:</b></p>
+<p style="font-size: 35px; text-align: left"><b>Ваши отклики:</b></p>
 <br>
     {% for r in responses %}
     <div style="font-size: 30px; text-align: left">
@@ -64,7 +68,7 @@
     {% if not forloop.last %}<hr>{% endif %}
     {% endfor %}
 {% else %}
-    <h1>Этот автор ещё не откликнулся ни на одно объявление!</h1>
+     {% if player.user == user %}<h1>Вы ещё не откликнулись ни на одно объявление</h1>{% else %}<h1>Этот автор ещё не откликнулся ни на одно объявление!</h1>{% endif %}
 {% endif %}
 
 {% endblock content %}

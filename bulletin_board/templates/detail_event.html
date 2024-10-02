@@ -13,11 +13,11 @@
 <br>
 
 <div style="font-size: 35px; text-align: left; line-height: 1.5em">
-        {% show_event event.pk %}
+        {% show_event event.pk user %}
 
         <p style="font-size: 25px"><i><a href="{% url 'response' event.pk %}">Количество откликов: {{total}}</a></i></p>
         <p style="font-size: 25px"><i><a href="{% url 'create_response' event.pk %}">Откликнуться на объявление</a></i></p>
-        <p style="font-size: 25px"><i><a href="{% url 'delete of post' event.slug %}" style="color: red">Удалить объявление</a></i></p>
+        {% if user.player == event.player or user.is_superuser %}<p style="font-size: 25px"><i><a href="{% url 'delete of post' event.slug %}" style="color: red">Удалить объявление</a></i></p>{% endif %}
 </div>
 
 

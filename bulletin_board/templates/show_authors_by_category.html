@@ -1,5 +1,5 @@
 {% if authors %}
-{% for a in authors %}
+{% for a in page_obj %}
 <div style="font-size: 34px; text-align: left">
     {% if a.profile_picture %}<img src="{{a.profile_picture.url}}" align="right" width="520" height="496" vspace="10" alt="Аватарка" title="Аватарка" hspace="3" border="1">{% endif %}
     <br>
@@ -15,6 +15,25 @@
     {% endif %}
 </div>
 {% endfor %}
+
+<div style="font-size: 28px" >
+{% if page_obj.has_previous %}
+    <a href="?page={{page_obj.previous_page_number}}"><</a>&nbsp;
+    <a href="?page=1">1</a>
+    {% if page_obj.previous_page_number != 1 %}
+    {% if page_obj.previous_page_number != 2 %}...{% endif %} <a href="?page={{page_obj.previous_page_number}}">{{page_obj.previous_page_number}}</a>
+    {% endif %}
+{% endif %}
+{{page_obj.number}}
+{% if page_obj.has_next %}
+    <a href="?page={{page_obj.next_page_number}}">{{page_obj.next_page_number}}</a>
+    {% if page_obj.next_page_number != paginator.num_pages %}
+    ... <a href="?page={{paginator.num_pages}}">{{paginator.num_pages}}</a>
+    {% endif %}
+    &nbsp;<a href="?page={{page_obj.next_page_number}}">></a>
+{% endif %}
+</div>
+
 {% else %}
 <h2>В данной гильдии не состоит ни один игрок!</h2>
 {% endif %}

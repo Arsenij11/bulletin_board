@@ -7,10 +7,13 @@
         <p>
                 <i>Рекомендуемый уровень: {{event.requirement_level}}</i>
         </p>
-        <p><i><a href="{% url 'update event' event.pk %}">Редактировать объявление...</a></i></p>
+        {% if user.player == event.player or user.is_superuser %}<p><i><a href="{% url 'update event' event.pk %}">Редактировать объявление...</a></i></p>{% endif %}
         <br clear="right">
-        {% autoescape off %}
-        <p style="font-size: 20px">{{event.text}}</p>
-        <p style="font-size: 20px"><b>Награды за турнир:</b></p>
-        <p style="font-size: 20px">{{event.awards}}</p>
-        {% endautoescape %}
+        <div style="font-size: 20px">
+                {% autoescape off %}
+                <p>{{event.text}}</p>
+{% if event.video %} <div align="center"><video src="{{event.video.url}}" controls="controls"></video></div>{% endif %}
+                <p><b>Награды за турнир:</b></p>
+                <p>{{event.awards}}</p>
+                {% endautoescape %}
+        </div>

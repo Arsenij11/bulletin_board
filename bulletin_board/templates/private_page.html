@@ -1,0 +1,53 @@
+{% extends 'flatpages/default.html' %}
+{% load custom_tags %}
+
+{% block title %}
+Приватная страница с откликами
+{% endblock %}
+
+{% block content %}
+<br>
+<h1>Отклики к Вашим объявлениям</h1>
+<br>
+<form method="GET" action="">
+        {{filterset.form.as_p}}
+        <button type="submit">Найти</button>
+    </form>
+{% if responses %}
+
+<hr>
+    {% for r in responses %}
+        <div style="font-size: 28px; text-align: left">
+            {% inf_resp r user %}
+
+            {% if not forloop.last %}
+            <hr>
+            {% endif %}
+
+        </div>
+    {% endfor %}
+{% else %}
+<hr>
+<h2>На Ваши объявления ещё никто не откликнулся!</h2>
+{% endif %}
+
+
+<div style="font-size: 28px" >
+{% if page_obj.has_previous %}
+    <a href="?page={{page_obj.previous_page_number}}"><</a>&nbsp;
+    <a href="?page=1">1</a>
+    {% if page_obj.previous_page_number != 1 %}
+    {% if page_obj.previous_page_number != 2 %}...{% endif %} <a href="?page={{page_obj.previous_page_number}}">{{page_obj.previous_page_number}}</a>
+    {% endif %}
+{% endif %}
+{{page_obj.number}}
+{% if page_obj.has_next %}
+    <a href="?page={{page_obj.next_page_number}}">{{page_obj.next_page_number}}</a>
+    {% if page_obj.next_page_number != paginator.num_pages %}
+    ... <a href="?page={{paginator.num_pages}}">{{paginator.num_pages}}</a>
+    {% endif %}
+    &nbsp;<a href="?page={{page_obj.next_page_number}}">></a>
+{% endif %}
+</div>
+
+{% endblock %}

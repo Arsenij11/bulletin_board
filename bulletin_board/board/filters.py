@@ -2,7 +2,7 @@ from django import forms
 import django_filters
 from django.contrib.auth.models import User
 
-from .models import Event, Players, Category
+from .models import Event, Players, Category, Responses
 
 
 class EventFilter(django_filters.FilterSet):
@@ -21,7 +21,7 @@ class EventFilter(django_filters.FilterSet):
        }
 
 class AuthorFilter(django_filters.FilterSet):
-    username = django_filters.ModelChoiceFilter(field_name='user',queryset=User.objects.all() ,label='Username игрока', empty_label='Username не указан')
+    name = django_filters.CharFilter(field_name='name', lookup_expr='icontains', label='Имя')
     guild = django_filters.ModelChoiceFilter(field_name='guild',queryset=Category.objects.all(), label='Гильдия', empty_label='Гильдия не указана')
     level = django_filters.NumberFilter(field_name='level', lookup_expr='lte', label='Уровень до')
     city = django_filters.CharFilter(field_name='city', lookup_expr='icontains', label='Город')
@@ -31,5 +31,18 @@ class AuthorFilter(django_filters.FilterSet):
         fields = {
             'age' : ['lte'],
             'sex' : ['exact']
+        }
+
+class ResponseFilter(django_filters.FilterSet):
+    added_before = django_filters.DateTimeFilter(field_name='time_create', lookup_expr='lte',
+                                                 widget=forms.DateTimeInput(format='%Y-%m-%dT%H:%M',
+                                                                            attrs={'type': 'datetime-local'}, ),
+                                                 label='Дата публикации до:')
+    event = django_filters.ModelChoiceFilter(field_name='event', queryset=Event.objects.all(),
+                                                     label='Объявление', empty_label='Объявление не выбрано')
+    class Meta:
+        model = Responses
+        fields = {
+            'message' : ['icontains']
         }
 

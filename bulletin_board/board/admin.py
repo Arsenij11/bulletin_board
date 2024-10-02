@@ -1,8 +1,7 @@
 from django.contrib import admin, messages
 from django.utils.safestring import mark_safe
 
-from .models import Event, Players, Responses, Category
-
+from .models import Event, Players, Responses, Category, AnswertoResponse
 
 
 @admin.register(Event)
@@ -347,3 +346,8 @@ class ResponsesPanel(admin.ModelAdmin):
     ordering = [ '-time_create', 'event', 'player__name']
     list_display_links = ['event', 'time_create']
 
+@admin.register(AnswertoResponse)
+class AnswerPanel(admin.ModelAdmin):
+    list_display = ['id', 'resp', 'player', 'message', 'time_create']
+    ordering = ['id']
+    list_display_links = ['id', 'resp']

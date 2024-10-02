@@ -1,0 +1,15 @@
+{% extends 'flatpages/default.html' %}
+
+{% block content %}
+<br>
+<h1>Удаление профиля</h1>
+<br>
+<hr>
+<form action="" method="post">
+    {% csrf_token %}
+    <p style="font-size: 30px">{{ author.name }}, Вы уверены, что хотите удалить свой профиль? Восстановление невозможно!</p>
+    <input style="color: red" type="submit" value="Delete" />
+</form>
+<br>
+<p><a href="{% url 'player' author.pk %}">Вернуться назад</a></p>
+{% endblock %}
