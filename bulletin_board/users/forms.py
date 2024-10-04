@@ -31,6 +31,7 @@ class RegistrationForm(UserCreationForm):
     password1 = forms.CharField(label='Пароль', widget=forms.PasswordInput())
     password2 = forms.CharField(label='Повтор пароля', widget=forms.PasswordInput())
     email = forms.CharField(label='E-mail', widget=forms.EmailInput(), required=True)
+    usable_password = None
 
     class Meta:
         model = get_user_model()
