@@ -28,5 +28,6 @@ urlpatterns = [
     path('delete_post/<slug:event_slug>', views.delete_post, name='delete of post'),
     path('successful_delete/<slug:event_slug>', views.successful_delete, name='successful delete'),
     path('private_web_page/<int:player_id>', views.PrivateWebPage.as_view(), name='private webpage'),
-    path('take_player/resp/<int:resp_id>',views.take_player_by_response, name='take player by response')
+    path('take_player/resp/<int:resp_id>',views.take_player_by_response, name='take player by response'),
+    path('draft/<int:player_id>', views.Draft.as_view(), name='draft_events')
 ]

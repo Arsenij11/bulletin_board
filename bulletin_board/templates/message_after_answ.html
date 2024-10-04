@@ -1,0 +1,12 @@
+<h2>{% if answ.resp.player.sex == "Male" %}Уважаемый{% else %}Уважаемая{% endif %} <u>{{answ.resp.player}}</u>!</h2><br>
+<p>Игрок {{answ.player}} прокомментировал Ваш отклик к объявлению {{answ.resp.event}}!<br><br>С уважением,<br>Команда Bulletin Board</p>
+<br>
+<br>
+<div style="font-size: 28px; text-align: left">
+                    <img src="{{answ.player.profile_picture.url}}" align="left" width="155" height="155" alt="Аватарка" title="Аватарка" hspace="15" border="1">
+                    <p><i><a href="http://127.0.0.1:8000/{{answ.player.get_absolute_url}}"> {{answ.player}}</a></i>
+
+
+                            <i style="font-size: 14px; color: grey">{{answ.time_create}}</i></p>
+            <p>{{answ.message}}</p>
+</div>

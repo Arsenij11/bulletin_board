@@ -1,0 +1,12 @@
+<h2>{% if resp.event.player.sex == "Male" %}Уважаемый{% else %}Уважаемая{% endif %} <u>{{resp.event.player}}</u>!</h2><br>
+<p>Новый отклик от игрока <b>{{resp.player}}</b> к объявлению <b>{{resp.event}}</b>!<br><br>С уважением,<br>Команда Bulletin Board</p>
+<br>
+<br>
+<div style="font-size: 28px; text-align: left">
+                    <img src="{{resp.player.profile_picture.url}}" align="left" width="155" height="155" alt="Аватарка" title="Аватарка" hspace="15" border="1">
+                    <p><i><a href="{{r.player.get_absolute_url}}"> {{resp.player}}</a></i>
+
+
+                            <i style="font-size: 14px; color: grey">{{resp.time_create}}</i></p>
+            <p>{{resp.message}}</p>
+</div>

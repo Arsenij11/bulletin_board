@@ -1,0 +1,12 @@
+{% extends 'flatpages/default.html' %}
+
+{% block title %}
+Успешная регистрация
+{% endblock %}
+
+{% block content %}
+<br>
+<h1>Вы успешно прошли регистрацию!</h1>
+<br>
+<p>Перейдите по ссылке, чтобы авторизоваться: <a href="{% url 'users:login' %}">{% url 'users:login' %}</a></p>
+{% endblock %}

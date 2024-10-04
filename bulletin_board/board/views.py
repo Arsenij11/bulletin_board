@@ -1,13 +1,16 @@
 from urllib.parse import urlencode
 
+from django.contrib.auth import get_user_model, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.mail import send_mail, EmailMultiAlternatives
 from django.core.paginator import Paginator
 from django.db.models import Count, Q
 from django.http import HttpResponse, QueryDict, Http404
 from django.shortcuts import render, get_object_or_404, redirect
+from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
 from django.views import generic
 from django.views.generic import ListView, DetailView, TemplateView, CreateView, UpdateView, DeleteView
@@ -97,7 +100,7 @@ class ShowPost(LoginRequiredMixin,DataMixin,DetailView):
         context = super().get_context_data(**kwargs)
         return self.get_mixin_objects\
             (context,
-            title=f'Объявление {context["event"].title}' if context["object"] is not None else 'Объявление не создано или находится на проверке',
+            title=f'Объявление {context["event"].title}' if context["object"] is not None else 'Объявление не создано или находится в черновике',
              total=len(context["event"].resp.all()) if context["object"] is not None else None)
 
 
@@ -167,6 +170,26 @@ class CreateResponse(LoginRequiredMixin,DataMixin,CreateView):
             return super(CreateResponse, self).dispatch(request,*args,**kwargs)
 
         return redirect('create profile')
+
+    def get_success_url(self):
+        resp = list(Responses.objects.filter(player_id=self.request.user.player.id, event_id=self.kwargs[self.pk_url_kwarg]).order_by('time_create'))[-1]
+
+        if resp.event.player.user.id != resp.player.user.id:
+            subject = 'Новый отклик!'
+            text = f'{"Уважаемый" if resp.event.player.sex == "Male" else "Уважаемая"} {resp.event.player}!\n' \
+                   f'Новый отклик от игрока {resp.player} к объявлению {resp.event}!\n\nС уважением,\nКоманда Bulletin Board'
+            html = render_to_string(request=self.request, template_name='message_after_resp.html',
+                                              context={'resp': resp})
+            msg = EmailMultiAlternatives(
+                subject=subject, body=text, from_email=None, to=[resp.event.player.user.email]
+            )
+            msg.attach_alternative(html, "text/html")
+            msg.send()
+
+        return reverse('response', kwargs={'event_id': self.kwargs[self.pk_url_kwarg]})
+
+
+
 
 
 
@@ -289,7 +312,6 @@ class UpdateProfile(LoginRequiredMixin, DataMixin,UpdateView):
 
 class DeleteProfile(LoginRequiredMixin, DeleteView):
     template_name = 'delete_profile.html'
-    success_url = reverse_lazy('main')
     model = Players
     pk_url_kwarg = 'player_id'
     context_object_name = 'author'
@@ -299,6 +321,13 @@ class DeleteProfile(LoginRequiredMixin, DeleteView):
             return super(DeleteProfile, self).dispatch(request, *args, **kwargs)
 
         return redirect(reverse('player', kwargs={'player_id': self.kwargs[self.pk_url_kwarg]}))
+
+    def get_success_url(self):
+        user = self.request.user
+        logout(self.request)
+        if not user.is_superuser:
+            get_user_model().objects.get(pk=user.id).delete()
+        return reverse('main')
 
 
 class SearchProfile(LoginRequiredMixin,DataMixin,ListView):
@@ -402,6 +431,24 @@ class CreateAnswerToResponse(LoginRequiredMixin,DataMixin,CreateView):
 
         return redirect(reverse('show answers to response', kwargs={'resp_id' : self.kwargs['resp_id']}))
 
+    def get_success_url(self):
+        answ = list(AnswertoResponse.objects.filter(player_id=self.request.user.player.id,
+                                                    resp_id=self.kwargs['resp_id']).order_by('time_create'))[-1]
+
+        if self.request.user.id != answ.resp.player.user.id:
+            subject = 'Новый отклик!'
+            text = f'{"Уважаемый" if answ.resp.player.sex == "Male" else "Уважаемая"} {answ.resp.player}!\n' \
+                       f'Игрок {answ.player} прокомментировал Ваш отклик к объявлению {answ.resp.event}!\n\nС уважением,\nКоманда Bulletin Board'
+            html = render_to_string(request=self.request, template_name='message_after_answ.html',
+                                        context={'answ': answ})
+            msg = EmailMultiAlternatives(
+                    subject=subject, body=text, from_email=None, to=[answ.resp.player.user.email]
+                )
+            msg.attach_alternative(html, "text/html")
+            msg.send()
+
+        return reverse('show answers to response', kwargs={'resp_id':self.kwargs['resp_id']})
+
 
 
 class UpdateAnswerToResponse(LoginRequiredMixin,DataMixin,UpdateView):
@@ -440,7 +487,8 @@ class UpdateAnswerToResponse(LoginRequiredMixin,DataMixin,UpdateView):
 def delete_answer(request, answ_id):
     answer = get_object_or_404(AnswertoResponse, pk=answ_id)
 
-    if request.user == AnswertoResponse.objects.get(pk=answ_id).player.user or request.user.is_superuser or AnswertoResponse.objects.get(pk=answ_id).resp.event.player.user:
+    if request.user == AnswertoResponse.objects.get(pk=answ_id).player.user or request.user.is_superuser\
+            or AnswertoResponse.objects.get(pk=answ_id).resp.event.player.user == request.user:
 
         AnswertoResponse.objects.get(pk=answ_id).delete()
 
@@ -452,8 +500,8 @@ class PrivateWebPage(LoginRequiredMixin, DataMixin,ListView):
 
     def get_queryset(self):
         events = Event.published.filter(player_id=self.kwargs['player_id']).prefetch_related('resp').prefetch_related('category').select_related('player')
-        responses = Responses.objects.filter(Q(event__in=events) & ~Q(player_id=self.kwargs['player_id']))
-        self.filterset = ResponseFilter(self.request.GET, responses)
+        responses = Responses.objects.filter(Q(event__in=events) & ~Q(player_id=self.kwargs['player_id']) & ~Q(player_id=None))
+        self.filterset = ResponseFilter(self.request.GET, queryset=responses, request=self.request.user.id)
         return self.filterset.qs
 
     def get_context_data(self, **kwargs):
@@ -462,8 +510,7 @@ class PrivateWebPage(LoginRequiredMixin, DataMixin,ListView):
         return context
 
     def dispatch(self, request, *args, **kwargs):
-        if self.request.user == Players.objects.get(pk=self.kwargs['player_id']).user \
-                or self.request.user.is_superuser:
+        if self.request.user == Players.objects.get(pk=self.kwargs['player_id']).user:
             return super(PrivateWebPage, self).dispatch(request,*args, **kwargs)
 
         return redirect(reverse('player', kwargs={'player_id' : self.kwargs['player_id']}))
@@ -472,12 +519,33 @@ def take_player_by_response(request, resp_id):
     resp = get_object_or_404(Responses, pk=resp_id)
 
     if not resp.is_taken and request.user == resp.event.player.user and resp.player and resp.event.player.user != resp.player.user:
+        send_mail(
+            subject='Ваш отклик принят!',
+            message=f'{"Уважаемый" if resp.player.sex == "Male" else "Уважаемая"} {resp.player}!\n'
+                    f'Ваш отклик "{resp}" на объявление {resp.event} был принят!\n\nПоздравляем,\nКоманда Bulletin Board',
+            from_email=None,
+            recipient_list=[resp.player.user.email],
+            html_message=render_to_string(request=request,template_name='message_for_taken_players.html',context={'resp' : resp})
+        )
         Responses.objects.filter(pk=resp_id).update(is_taken=True)
 
-    return redirect(reverse('take player by response', kwargs={'player_id' : request.user.player.id}))\
+    return redirect(reverse('private webpage', kwargs={'player_id' : request.user.player.id}))\
         if request.user == resp.event.player.user else redirect(reverse('response', kwargs={'event_id' : resp.event.id}))
 
 
+class Draft(LoginRequiredMixin,DataMixin,ListView):
+    template_name = 'draft.html'
+    context_object_name = 'events'
 
+
+    def get_queryset(self):
+        return Event.objects.filter(is_published=False, player_id=self.kwargs['player_id']).select_related('player').prefetch_related('category')
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.request.user == Players.objects.get(pk=self.kwargs['player_id']).user \
+                or self.request.user.is_superuser:
+            return super(Draft, self).dispatch(request,*args, **kwargs)
+
+        return redirect(reverse('player', kwargs={'player_id' : self.kwargs['player_id']}))
 
 

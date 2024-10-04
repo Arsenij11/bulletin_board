@@ -12,7 +12,7 @@
         <div style="font-size: 20px">
                 {% autoescape off %}
                 <p>{{event.text}}</p>
-{% if event.video %} <div align="center"><video src="{{event.video.url}}" controls="controls"></video></div>{% endif %}
+{% if event.video %} <p align="center"><video src="{{event.video.url}}" controls="controls" width="1000px" height="auto"></video></p>{% endif %}
                 <p><b>Награды за турнир:</b></p>
                 <p>{{event.awards}}</p>
                 {% endautoescape %}

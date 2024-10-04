@@ -18,7 +18,9 @@
 
 {% if responses %}
     {% for r in responses %}
-        <div style="font-size: 28px; text-align: left">
+
+            <div style="font-size: 28px; text-align: left">
+
             {% inf_resp r user %}
 
             {% if not forloop.last %}

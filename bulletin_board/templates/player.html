@@ -23,7 +23,8 @@
     <p><i>Дата регистрации на сайте:</i></p>
     <p><i>{{player.registration_time}}</i></p>
     <br clear="left">
-    {% if user.player == player or user.is_superuser %}<p style="margin-left: 20px"><a href="{% url 'private webpage' player.pk %}"><i>Просмотреть отклики на объявления</i></a></p>{% endif %}
+    {% if user.player == player or user.is_superuser %}<p style="margin-left: 20px"><a href="{% url 'draft_events' player.pk %}"><i>Просмотреть черновые объявления</i></a></p>{% endif %}
+    {% if user.player == player %}<p style="margin-left: 20px"><a href="{% url 'private webpage' player.pk %}"><i>Просмотреть отклики на объявления</i></a></p>{% endif %}
     {% if user.player == player or user.is_superuser %}<p style="margin-left: 20px"><a href="{% url 'edit author' player.pk %}"><i>Редактировать профиль</i></a></p>{% endif %}
     {% if user.player == player or user.is_superuser %}<p style="margin-left: 20px"><a href="{% url 'delete author' player.pk %}" style="color: red"><i>Удалить профиль</i></a></p>{% endif %}
 </div>
@@ -33,7 +34,7 @@
 
 {% if events %}
 
-    <p style="font-size: 40px; text-align: left"><b>Ваши объявления:</b></p>
+    <p style="font-size: 40px; text-align: left">{% if player.user == user %}<b>Ваши объявления:</b>{% else %}<b>Все объявления игрока:</b>{% endif %}</p>
     <br>
     {% for event in events %}
     <div style="font-size: 30px; text-align: left">
@@ -56,7 +57,7 @@
 <hr>
 <br>
 {% if responses %}
-<p style="font-size: 35px; text-align: left"><b>Ваши отклики:</b></p>
+<p style="font-size: 35px; text-align: left">{% if player.user == user %}<b>Ваши отклики:</b>{% else %}<b>Все отклики игрока:</b>{% endif %}</p>
 <br>
     {% for r in responses %}
     <div style="font-size: 30px; text-align: left">

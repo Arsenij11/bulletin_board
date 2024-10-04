@@ -10,7 +10,7 @@ def get_event(event_id):
 class AddPostForm(forms.ModelForm):
     class Meta:
         model = Event
-        fields = ['title', 'slug','text', 'category','awards', 'requirement_level', 'photo', 'video']
+        fields = ['title', 'slug','text', 'category','awards', 'requirement_level', 'photo', 'video', 'is_published']
         widgets = {'title' : forms.TextInput(attrs={'class' : 'form-input'}),
                    'text' : forms.Textarea(attrs={'cols' : 50, 'rows' : 5}),
                    'awards': forms.Textarea(attrs={'cols': 50, 'rows': 5})

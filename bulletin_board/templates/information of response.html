@@ -1,7 +1,7 @@
 
                 {% if r.player %}
                     <img src="{{r.player.profile_picture.url}}" align="left" width="155" height="155" alt="Аватарка" title="Аватарка" hspace="15" border="1">
-                    <p><i><a href="{{r.player.get_absolute_url}}"> {{r.player}}</a></i>
+                    <p><i><a href="{{r.player.get_absolute_url}}"> {{r.player}}</a>{% if r.is_taken %}✅{% endif %}</i>
                         {% else %}
                     <img src="/media/photo/players/default/delete_profile.jpg" align="left" width="155" height="155" alt="Удалённый пользователь" title="Удалённый пользователь" hspace="15" border="1">
                         <p style="color:#0d6efd">DELETED

@@ -17,8 +17,9 @@
 <hr>
 
 {% for r in responses %}
-<div style="font-size: 28px; text-align: left">
-    {% inf_resp r %}
+            <div style="font-size: 28px; text-align: left">
+
+    {% inf_resp r user %}
         {% if ourresp == r.pk %}
                 {% for a in r.answers.all %}
                     {% if not forloop.first %}<br>{% endif %}
