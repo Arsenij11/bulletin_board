@@ -17,6 +17,7 @@ Including another URLconf
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
+from .page_not_found import page_not_found
 
 from bulletin_board import settings
 
@@ -27,9 +28,10 @@ urlpatterns = [
     path('__debug__/', include('debug_toolbar.urls'))
 ]
 
-
+# if settings.DEBUG:
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
+handler404 = page_not_found
 
 admin.site.site_header = 'Панель администрирования сайта "Доска объявлений"'
 admin.site.index_title = 'Доска объявлений'
