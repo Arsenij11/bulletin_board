@@ -156,6 +156,7 @@ class CreateResponse(LoginRequiredMixin,DataMixin,CreateView):
         resp = form.save(commit=False)
         resp.event = Event.objects.get(pk=self.kwargs[self.pk_url_kwarg])
         resp.player = Players.objects.get(user_id=self.request.user.id)
+        self.player = resp.player
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
@@ -172,7 +173,7 @@ class CreateResponse(LoginRequiredMixin,DataMixin,CreateView):
         return redirect('create profile')
 
     def get_success_url(self):
-        resp = list(Responses.objects.filter(player_id=self.request.user.player.id, event_id=self.kwargs[self.pk_url_kwarg]).order_by('time_create'))[-1]
+        resp = list(Responses.objects.filter(player_id=self.player.id, event_id=self.kwargs[self.pk_url_kwarg]).order_by('time_create'))[-1]
 
         if resp.event.player.user.id != resp.player.user.id:
             subject = 'Новый отклик!'
@@ -214,6 +215,8 @@ class UpdateResponse(LoginRequiredMixin,DataMixin,UpdateView):
                                       responses=Responses.objects.filter(event_id=event.pk),
                                       ourresp=Responses.objects.get(pk=self.kwargs[self.pk_url_kwarg]))
     def dispatch(self, request, *args, **kwargs):
+        if Responses.objects.get(pk=self.kwargs[self.pk_url_kwarg]).player is None:
+            return redirect(reverse('response', kwargs={'event_id': Responses.objects.get(pk=self.kwargs[self.pk_url_kwarg]).event.id}))
         if self.request.user == Responses.objects.get(pk=self.kwargs[self.pk_url_kwarg]).player.user or self.request.user.is_superuser:
             return super(UpdateResponse, self).dispatch(request,*args,**kwargs)
 
@@ -301,7 +304,7 @@ class UpdateProfile(LoginRequiredMixin, DataMixin,UpdateView):
                                       title=Players.objects.get(pk=self.kwargs[self.pk_url_kwarg]))
 
     def dispatch(self, request, *args, **kwargs):
-        if self.request.user == Players.objects.get(pk=self.kwargs[self.pk_url_kwarg]).user or self.request.is_superuser:
+        if self.request.user == Players.objects.get(pk=self.kwargs[self.pk_url_kwarg]).user or self.request.user.is_superuser:
             return super(UpdateProfile, self).dispatch(request, *args, **kwargs)
 
 
@@ -316,17 +319,20 @@ class DeleteProfile(LoginRequiredMixin, DeleteView):
     pk_url_kwarg = 'player_id'
     context_object_name = 'author'
 
+
+
     def dispatch(self, request, *args, **kwargs):
-        if self.request.user == Players.objects.get(pk=self.kwargs[self.pk_url_kwarg]).user or self.request.is_superuser:
+        if self.request.user == Players.objects.get(pk=self.kwargs[self.pk_url_kwarg]).user or self.request.user.is_superuser:
+            self.user = Players.objects.get(pk=self.kwargs[self.pk_url_kwarg]).user
             return super(DeleteProfile, self).dispatch(request, *args, **kwargs)
 
         return redirect(reverse('player', kwargs={'player_id': self.kwargs[self.pk_url_kwarg]}))
 
     def get_success_url(self):
         user = self.request.user
-        logout(self.request)
         if not user.is_superuser:
-            get_user_model().objects.get(pk=user.id).delete()
+            logout(self.request)
+        get_user_model().objects.get(pk=self.user.pk).delete()
         return reverse('main')
 
 
@@ -366,8 +372,12 @@ class AllResponses(LoginRequiredMixin,ListView):
 def delete_response(request,resp_id):
     resp = get_object_or_404(Responses, pk=resp_id)
 
-    if request.user == Responses.objects.get(pk=resp_id).player.user or request.user.is_superuser or Responses.objects.get(pk=resp_id).event.player.user:
-        Responses.objects.get(pk=resp_id).delete()
+    if Responses.objects.get(pk=resp_id).player is None:
+        if request.user.is_superuser or request.user == Responses.objects.get(pk=resp_id).event.player.user:
+            Responses.objects.get(pk=resp_id).delete()
+    else:
+        if request.user == Responses.objects.get(pk=resp_id).player.user or request.user.is_superuser or request.user == Responses.objects.get(pk=resp_id).event.player.user:
+            Responses.objects.get(pk=resp_id).delete()
 
 
     return redirect(reverse('response', kwargs={'event_id': resp.event.pk}))
@@ -476,9 +486,14 @@ class UpdateAnswerToResponse(LoginRequiredMixin,DataMixin,UpdateView):
                                       )
 
     def dispatch(self, request, *args, **kwargs):
-        if self.request.user == AnswertoResponse.objects.get(pk=self.kwargs[self.pk_url_kwarg]).player.user \
-                or self.request.user.is_superuser:
-            return super(UpdateAnswerToResponse, self).dispatch(request,*args, **kwargs)
+        if AnswertoResponse.objects.get(pk=self.kwargs[self.pk_url_kwarg]).player is None:
+            return redirect(reverse('show answers to response',
+                                    kwargs={
+                                        'resp_id': AnswertoResponse.objects.get(pk=self.kwargs['answ_id']).resp.id}))
+        else:
+            if self.request.user == AnswertoResponse.objects.get(pk=self.kwargs[self.pk_url_kwarg]).player.user \
+                    or self.request.user.is_superuser:
+                return super(UpdateAnswerToResponse, self).dispatch(request,*args, **kwargs)
 
         return redirect(reverse('show answers to response',
                                 kwargs={'resp_id' : AnswertoResponse.objects.get(pk=self.kwargs['answ_id']).resp.id}))
@@ -487,10 +502,14 @@ class UpdateAnswerToResponse(LoginRequiredMixin,DataMixin,UpdateView):
 def delete_answer(request, answ_id):
     answer = get_object_or_404(AnswertoResponse, pk=answ_id)
 
-    if request.user == AnswertoResponse.objects.get(pk=answ_id).player.user or request.user.is_superuser\
-            or AnswertoResponse.objects.get(pk=answ_id).resp.event.player.user == request.user:
+    if AnswertoResponse.objects.get(pk=answ_id).player is None:
+        if request.user.is_superuser or AnswertoResponse.objects.get(pk=answ_id).resp.event.player.user == request.user:
+            AnswertoResponse.objects.get(pk=answ_id).delete()
+    else:
+        if request.user == AnswertoResponse.objects.get(pk=answ_id).player.user or request.user.is_superuser\
+                or AnswertoResponse.objects.get(pk=answ_id).resp.event.player.user == request.user:
 
-        AnswertoResponse.objects.get(pk=answ_id).delete()
+            AnswertoResponse.objects.get(pk=answ_id).delete()
 
     return redirect(reverse('show answers to response', kwargs={'resp_id': answer.resp_id}))
 
@@ -518,16 +537,17 @@ class PrivateWebPage(LoginRequiredMixin, DataMixin,ListView):
 def take_player_by_response(request, resp_id):
     resp = get_object_or_404(Responses, pk=resp_id)
 
-    if not resp.is_taken and request.user == resp.event.player.user and resp.player and resp.event.player.user != resp.player.user:
-        send_mail(
-            subject='Ваш отклик принят!',
-            message=f'{"Уважаемый" if resp.player.sex == "Male" else "Уважаемая"} {resp.player}!\n'
-                    f'Ваш отклик "{resp}" на объявление {resp.event} был принят!\n\nПоздравляем,\nКоманда Bulletin Board',
-            from_email=None,
-            recipient_list=[resp.player.user.email],
-            html_message=render_to_string(request=request,template_name='message_for_taken_players.html',context={'resp' : resp})
-        )
-        Responses.objects.filter(pk=resp_id).update(is_taken=True)
+    if resp.player is not None:
+        if not resp.is_taken and request.user == resp.event.player.user and resp.event.player.user != resp.player.user:
+            send_mail(
+                subject='Ваш отклик принят!',
+                message=f'{"Уважаемый" if resp.player.sex == "Male" else "Уважаемая"} {resp.player}!\n'
+                        f'Ваш отклик "{resp}" на объявление {resp.event} был принят!\n\nПоздравляем,\nКоманда Bulletin Board',
+                from_email=None,
+                recipient_list=[resp.player.user.email],
+                html_message=render_to_string(request=request,template_name='message_for_taken_players.html',context={'resp' : resp})
+            )
+            Responses.objects.filter(pk=resp_id).update(is_taken=True)
 
     return redirect(reverse('private webpage', kwargs={'player_id' : request.user.player.id}))\
         if request.user == resp.event.player.user else redirect(reverse('response', kwargs={'event_id' : resp.event.id}))

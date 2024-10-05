@@ -12,7 +12,7 @@
             <p>
                 {% if user.player == r.player or user.is_superuser or r.event.player.user == user %}<a href="{% url 'delete response' r.pk %}" style="font-size: 12px; color: red"><i>Удалить</i></a>{% endif %}
                 {% if r.event.player.user == user and not r.is_taken and r.player and r.event.player.user != r.player.user %}<a href="{% url 'take player by response' r.pk %}" style="font-size: 12px; color: green"><i>Принять</i></a>{% endif %}
-                {% if user.player == r.player or user.is_superuser %} <a href="{% url 'update response' r.pk %}" style="font-size: 12px; color: grey"><i>Редактировать</i></a>{% endif %}
+                {% if r.player %} {% if user.player == r.player or user.is_superuser %} <a href="{% url 'update response' r.pk %}" style="font-size: 12px; color: grey"><i>Редактировать</i></a>{% endif %} {% endif %}
                 {% if r.answers.exists %}<a href="{% url 'show answers to response' r.pk %}" style="font-size: 12px; color: grey"><i>Просмотреть все ответы к отклику</i></a>{% endif %}
                 <a href="{% url 'create answer' r.pk %}" style="font-size: 12px; color: grey"><i>Ответить</i></a>
             </p>
